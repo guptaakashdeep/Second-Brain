@@ -1,7 +1,9 @@
 ---
-title: Index for TIL
+title: Welcome to Akashdeep Second Brain
 cssclasses:
 - page-brown
 ---
 
-This is the index of all the TILs pages created over time. this will include tags for each note along with the dates here so it's easier to navigate
+This will serve as the index for all my notes, brain dumps, and the links between them, allowing me to interrelate different concepts.
+
+This is the origin of my in-depth Technical Newsletter: [The Pragmatic Data Engineer's Playbook](https://www.guptaakashdeep.com/)
