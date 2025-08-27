@@ -1,5 +1,6 @@
 ---
 title: Magnet - Push based shuffle service
+draft: true
 tags:
 - Spark
 - DataEngineering
