@@ -1,6 +1,6 @@
 ---
 title: Right Sizing Spark Executors
-publish: false
+publish: true
 draft: false
 enableToc: true
 tags:
@@ -26,11 +26,6 @@ The system:
 - Policy-based adjustment: OOM errors trigger a 50% memory increase **(Policy P0: Executor OOM Scale Up)**; otherwise, a heuristic uses a 30-day memory usage history to set memory with conservative buffers for jobs with limited historical data **(Policy P1: Heuristic-Based Executor Memory Scale Up/Down)**.
 
 - Guardrails cap how much memory can scale up or down to maintain stability.
-
-### Architecture
-***
-
-
 ## My Thoughts
 This is an excellent solution that, with some effort, can significantly improve resource utilization for jobs in a multi-tenant Spark cluster.
 
@@ -41,11 +36,11 @@ The cost models for these serverless solutions are primarily based on the amount
 Although the LinkedIn blog does not provide detailed implementation steps, it does offer lots of details that can be used by a seasoned Spark Developer.
 
 ### Implementation Idea
-Here's how I am planning to implement it
+Here's how I am thinking to implement it
 
 The general idea is to get these details for **every executor** for a Spark Application:
 - `PeakJVMMemory` details, i.e., `MAX_HEAP_MEMORY`
-- `ProcessMapMemory` details, i.e., `MAX_TOTAL_MEMORY`
+- `ProcessTreeMemory` details, i.e., `MAX_TOTAL_MEMORY`
 - Calculate `MAX_OVERHEAD_MEMORY`
 
 $$OverheadMemory_{max} = TotalMemory_{max} \ - \ HeapMemory_{max}$$
@@ -68,9 +63,21 @@ Once we get all the `peakMemoryMetrics` from SHS for ***EACH*** executor, memory
 $$
 \begin{gather*}
 HeapMemory_{max} \ = \ JVMHeapMemory \ + \ JVMOffHeapMemory \\\\
-TotalMemory_{max} \ = \ ProcessTreeJVMRSSMemory \\\ + \ ProcessTreePythonRSSMemory \\\ + \ ProcessTreeOtherRSSMemory
+TotalMemory_{max} \ = \ ProcessTreeJVMRSSMemory
 \end{gather*}
 $$
+
+>[!tip]- ProcessTree Memory Metrics
+> ProcessTree Memory RSS Metrics has 3 types of metrics being reported:
+> - `ProcessTreeJVMRSSMemory`
+> - `ProcessTreePythonRSSMemory`
+> - `ProcessTreeOtherRSSMemory`
+> 
+> Initial thinking was: `TOTAL_MAX_MEMORY` will be sum of these, but looking at the metrics for a particular job, it looks like `ProcessTreeJVMRSSMemory` include `ProcessTreePythonRSSMemory` also when there is any Python UDF being used in the Spark Application.
+> 
+> ***How did I conclude this?***
+> If I add both `ProcessTreeJVMRSSMemory` and `ProcessTreePythonRSSMemory` this is exceeding the entire [[Executor Container Memory]]. Also, `ProcessTreeJVMRSSMemory` actually includes the entire process and the child process memory. During Python UDF execution, a worker process is initialized by the executor as a child process.
+
 
 [[Relation between Heap and RSS Memory in Spark]] explains more details on how these are related.
 
