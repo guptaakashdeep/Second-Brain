@@ -6,7 +6,7 @@ enableToc: true
 tags:
   - Spark
   - Optimization
-  - Performance
+  - DataEnginnering
 cssclasses:
   - page-rainbow
 ---
@@ -76,10 +76,10 @@ $$
 > Initial thinking was: `TOTAL_MAX_MEMORY` will be sum of these, but looking at the metrics for a particular job, it looks like `ProcessTreeJVMRSSMemory` include `ProcessTreePythonRSSMemory` also when there is any Python UDF being used in the Spark Application.
 > 
 > ***How did I conclude this?***
-> If I add both `ProcessTreeJVMRSSMemory` and `ProcessTreePythonRSSMemory` this is exceeding the entire [[Executor Container Memory]]. Also, `ProcessTreeJVMRSSMemory` actually includes the entire process and the child process memory. During Python UDF execution, a worker process is initialized by the executor as a child process.
+> If I add both `ProcessTreeJVMRSSMemory` and `ProcessTreePythonRSSMemory` this is exceeding the entire [[Spark Unified Memory Management|Executor Container Memory]]. Also, `ProcessTreeJVMRSSMemory` actually includes the entire process and the child process memory. During Python UDF execution, a worker process is initialized by the executor as a child process.
 
 
-[[Relation between Heap and RSS Memory in Spark]] explains more details on how these are related.
+[[Heap and RSS in Spark|Relation between Heap and RSS Memory in Spark]] explains more details on how these are related.
 
 Once you have all these details, LinkedIn Blog mentions to calculate the suggested `HEAP` and `OVERHEAD` memory using:
 
