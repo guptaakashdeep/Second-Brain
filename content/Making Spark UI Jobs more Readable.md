@@ -1,7 +1,5 @@
 ---
 title: Making Spark UI Jobs More Readable
-publish: true
-draft: false
 enableToc: true
 tags:
   - Spark
