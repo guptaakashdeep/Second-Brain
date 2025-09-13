@@ -8,8 +8,12 @@ This will serve as the index for all my notes, brain dumps, and the links betwee
 
 This is the origin of my in-depth Technical Newsletter: [The Pragmatic Data Engineer's Playbook](https://www.guptaakashdeep.com/)
 
+# Tags
+#DataEngineering #Spark #Iceberg #internals #Debug #Airflow 
 # Index
 
+- Sep 13, 2025: [[Dataclasses - When to and not to use]]
+- Sep 13, 2025: [[What the heck are Percentiles?]]
 - Sep 07, 2025: [[Making Spark UI Jobs more Readable]]
 - Aug 31, 2025: [[Understanding FetchFailedException Message]]
 - Aug 31, 2025: [[Right Sizing Spark Executors]]

@@ -6,7 +6,7 @@ enableToc: true
 tags:
   - Spark
   - Optimization
-  - DataEnginnering
+  - DataEngineering
 cssclasses:
   - page-rainbow
 ---
@@ -92,7 +92,7 @@ $$
 
 Looking at this formula directly, it appears to use raw maxima to suggest updated values for `HeapMemory` and `OverheadMemory`. However, applying this approach can lead to over-provisioning of executor memory, especially in cases of data skew, where a single executor may experience significantly higher memory usage.
 
-I believe that using [[percentiles]] (such as `p50`, `p90`, or `p95`) of maximum memory usage is a more effective method for determining appropriate Heap and Overhead memory. This approach accounts for skewness without resulting in unnecessary over-provisioning of resources.
+I believe that using [[What the heck are Percentiles?|percentiles]] (such as `p50`, `p90`, or `p95`) of maximum memory usage is a more effective method for determining appropriate Heap and Overhead memory. This approach accounts for skewness without resulting in unnecessary over-provisioning of resources.
 
 #### Updated Calculation based on percentile
 - Calculate `p50` of Heap and Total memory to calculate Overhead Memory.
