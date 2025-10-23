@@ -12,11 +12,12 @@ This is the origin of my in-depth Technical Newsletter: [The Pragmatic Data Engi
 #DataEngineering #Spark #Iceberg #internals #Debug #Airflow 
 # Index
 
+- Oct 23, 2025: [[PyArrow - Read-Write into Hive External Tables]]
+- Oct 22, 2025 (Updated): [[Right Sizing Spark Executors]]
 - Sep 13, 2025: [[Dataclasses - When to and not to use]]
 - Sep 13, 2025: [[What the heck are Percentiles?]]
 - Sep 07, 2025: [[Making Spark UI Jobs more Readable]]
 - Aug 31, 2025: [[Understanding FetchFailedException Message]]
-- Aug 31, 2025: [[Right Sizing Spark Executors]]
 - Aug 31, 2025: [[Iceberg - Data and Delete File Relationship]]
 - Aug 31, 2025: [[ColumnarToRow in Spark|Why does Spark convert Columnar Data into Row Orientation?]]
 - Aug 31, 2025: [[Data-aware scheduling from callbacks in Airflow]]

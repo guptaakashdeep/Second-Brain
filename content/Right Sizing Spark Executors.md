@@ -90,17 +90,86 @@ OverheadMemory = OverheadMemory_{max} + BUFFER \times \left( \frac{OverheadMemor
 \end{gather*}
 $$
 
-Looking at this formula directly, it appears to use raw maxima to suggest updated values for `HeapMemory` and `OverheadMemory`. However, applying this approach can lead to over-provisioning of executor memory, especially in cases of data skew, where a single executor may experience significantly higher memory usage.
+Looking at this formula directly, it appears to use raw maxima to suggest updated values for `HeapMemory` and `OverheadMemory`. However, applying this approach might lead to ***slight*** over-provisioning of executor memory, especially in cases of data skew, where a single executor may experience significantly higher memory usage.
 
-I believe that using [[What the heck are Percentiles?|percentiles]] (such as `p50`, `p90`, or `p95`) of maximum memory usage is a more effective method for determining appropriate Heap and Overhead memory. This approach accounts for skewness without resulting in unnecessary over-provisioning of resources.
+#### Deciding `BUFFER`
+A good point to start buffer is with `25-30%`, when there are no historical runs present for an application. This is to avoid any aggressive downscaling and causing OOM or significantly under provisioning.
 
-#### Updated Calculation based on percentile
-- Calculate `p50` of Heap and Total memory to calculate Overhead Memory.
-- Calculate `p90` of Heap and Total memory to calculate Overhead Memory.
-- If `p90 - p50` gap is small (e.g., < 10-20% of `p50` => `(p90 - p50)/p50` ), `p90` is a good point to do the further calculation
-- if `p90 - p50` gap is **large** (e.g., >20-30% of p50), flag/highlight:
-	- **Investigate further:** Is the skew legitimate (e.g., data skew, uneven partitions)? Can the job be optimized to balance usage?
-	- Optionally set a “middle ground”:
-	    - Take a **weighted mean** between p50 and p90 (e.g., 70% p50 + 30% p90).
-	    - Allow the user to select/confirm whether to provision for p90 (safe but costly) or p50 (more efficient, might risk OOM for outliers).
-	- Can be configurable.
+Here's what I have decided to do:
+- `runs < 8`, use `25%` buffer
+- `runs > 8`, use `15%` buffer
+
+Further in the post there will be a section that explains how to decide on a Good Value after `N` number of runs for a Spark Application.
+
+>[!infor]- Additional Ideas - Discarded for simplicity
+>
+>After running multiple tests, it's better to keep it simple. Right sizing calculation will still be close to the accurate calculation.
+>
+>Previous idea, is discarded for now.
+>
+>I believe that using [[What the heck are Percentiles?|percentiles]] (such as `p50`, `p90`, or `p95`) of maximum memory usage is a more effective method for determining appropriate Heap and Overhead memory. This approach accounts for skewness without resulting in unnecessary over-provisioning of resources.
+>
+>#### Updated Calculation based on percentile
+>
+>- Calculate `p50` of Heap and Total memory to calculate Overhead Memory.
+>- Calculate `p90` of Heap and Total memory to calculate Overhead Memory.
+>- If `p90 - p50` gap is small (e.g., < 10-20% of `p50` => `(p90 - p50)/p50` ), `p90` is a good point to do the further calculation
+>- if `p90 - p50` gap is **large** (e.g., >20-30% of p50), flag/highlight:
+>	- **Investigate further:** Is the skew legitimate (e.g., data skew, uneven partitions)? Can the job be optimized to balance usage?
+>	- Optionally set a “middle ground”:
+>	- Take a **weighted mean** between p50 and p90 (e.g., `70% p50 + 30% p90`).
+>	- Allow the user to select/confirm whether to provision for p90 (safe but costly) or p50 (more efficient, might risk OOM for outliers).
+>	- Can be configurable.
+
+### Calculating Number of Executors
+To extend this idea a bit more, identifying correct number of executors is also required, especially in case of dynamic resource allocation for max executors, i.e. `spark.dynamicAllocation.maxExecutors`
+
+One of the good strategy is to identify how long the executor was idle during it's entire active duration. This can simply be calculated for each executor using:
+
+$$
+\begin{gather*}
+Executor_{uptime} = Executor_{removeTime} - Executor_{addTime} \\\\
+Executor_{idletime} = (Executor_{uptime}  \times Executor_{cores}) - totalDuration \\\\
+Executor_{idlepercentage} = \left( \frac{Executor_{idletime}}{Executor_{uptime}} \right) \times 100
+\end{gather*}
+$$
+
+> [!tip]- Executor Metrics
+> - `addTime`: Timestamp when the executors was added.
+> - `isActive`: Boolean value. `true` if executor was active during application's lifetime. In this case, `removeTime` will not be available. `ApplicationEndTime`
+> - `removeTime`: Timestamp when the executor was removed (if removed).
+> - `totalDuration`: Elapsed time the JVM spent executing tasks in this executor (in ms).
+> - `totalCores`: Number of cores available in this executor.
+
+Once idle percentage of all the executors are calculated, we can: 
+- Calculate average idle percentage, `avg_idle_pct`.
+- Define a threshold/expected percentage, from my experience `15-20%` is a good point to start, `target_idle_pct`.
+- `avg_idle_pct > targe_idle_pct`, adjust the max executors by calculating `adjustment_factor` and multiplying with max executors
+
+Sample code snippet:
+
+```python
+import numpy as np
+
+target_idle_pct = 0.15
+avg_idle_pct = np.mean([
+		executor_metric["idle_percentage"] 
+		for executor_metric in metrics
+	])
+
+if avg_idle_pct < target_idle_pct:
+	adjustment_factor = 1 - (avg_idle_pct / 100.0)
+	recommended_max = max(int(max_executors * adjustment_factor), 1)
+```
+
+### GuardRails
+- Extreme downscaling - percentage cap of downscale not more than 30%
+- Recommended Heap and Overhead memory shouldn't be 0.
+	- OnHeapMemory recommendation coming as `0`, represents that the executors that were allocated are not used at all.
+	- Probably an application that doesn't really require Spark and can be rewritten without it.
+- Start with an initial configuration
+- in case of increment because of OOM, make sure an executor doesn't exceed the Nodes Task Memory defined by YARN
+### Deciding Last Known Good (LKG) Value
+Factors to consider:
+- time taken for completion is not increased.
+- No spills are introduced.
