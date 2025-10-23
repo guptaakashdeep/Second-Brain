@@ -13,7 +13,7 @@ cssclasses:
 
 There are multiple ways to read from /write into Hive External tables using Python (without Apache Spark). Most of them (depending on the library being used, of course) require listing the files in the table location.
 
-One of the classic and very first options that comes to mind is via using Pandas.
+One of the classic and very first options that comes to mind is via using Pandas, but there is a more performant way via using PyArrow.
 
 ## Reads using PyArrow
 To read a Hive-partitioned external table stored as Parquet files on S3 using PyArrow, the PyArrow Dataset API can be used, which has built-in support for Hive-style partitioning and S3 access.
