@@ -7,11 +7,9 @@ cssclasses:
 This will serve as the index for all my notes, brain dumps, and the links between them, allowing me to interrelate different concepts.
 
 This is the origin of my in-depth Technical Newsletter: [The Pragmatic Data Engineer's Playbook](https://www.guptaakashdeep.com/)
-
-# Tags
-#DataEngineering #Spark #Iceberg #internals #Debug #Airflow 
 # Index
 
+- Oct 24, 2025: [[Sum Types in SQL]]
 - Oct 23, 2025: [[PyArrow - Read-Write into Hive External Tables]]
 - Oct 22, 2025 (Updated): [[Right Sizing Spark Executors]]
 - Sep 13, 2025: [[Dataclasses - When to and not to use]]
