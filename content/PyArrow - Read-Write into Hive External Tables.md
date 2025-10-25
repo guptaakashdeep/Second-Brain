@@ -6,7 +6,7 @@ enableToc: true
 tags:
   - pyarrow
   - programming
-  - optimization
+  - Optimization
 cssclasses:
   - page-rainbow
 ---

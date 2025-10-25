@@ -7,8 +7,11 @@ cssclasses:
 This will serve as the index for all my notes, brain dumps, and the links between them, allowing me to interrelate different concepts.
 
 This is the origin of my in-depth Technical Newsletter: [The Pragmatic Data Engineer's Playbook](https://www.guptaakashdeep.com/)
+
+#DataEngineering #Spark #internals #Optimization #Programming #Airflow #BestPractices #Python #Debug  
 # Index
 
+- Oct 25, 2025: [[Why Do Parquet and ORC Store Data That Way?]]
 - Oct 24, 2025: [[Sum Types in SQL]]
 - Oct 23, 2025: [[PyArrow - Read-Write into Hive External Tables]]
 - Oct 22, 2025 (Updated): [[Right Sizing Spark Executors]]
