@@ -47,7 +47,7 @@ To understand the reasons, we need to understand the benefits and drawbacks of:
 - To fetch multiple attributes, multiple files need to be read.
 - **Lack of Spatial Locality**: To reconstruct a record returned by a query, all attributes must be stitched together via ***sub-joins***.
 
-![[Pasted image 20251025120401.png]]
+![[DSM-Storage-Format.png]]
 
 
 In real OLAP workloads, queries involve multiple attributes, making a columnar storage layout inefficient. As more attributes are fetched, the cost of stitching them into a record, requiring sub-joins, rises.
@@ -60,7 +60,7 @@ PAX brings the best of both storage formats:
 
 The hybrid columnar layout (PAX) enables the query engines to use vectorized query processing and mitigates the record reconstruction overhead in a row group.
 
-![[Pasted image 20251025120440.png]]
+![[PAX-Storage-Format.png]]
 
 Modern data systems like Snowflake, DuckDB, and Apache Arrow leverage PAX for efficient storage and query performance.
 
