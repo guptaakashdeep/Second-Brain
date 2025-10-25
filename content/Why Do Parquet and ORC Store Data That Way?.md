@@ -1,7 +1,7 @@
 ---
 title: Why Do Parquet and ORC Store Data That Way?
-publish: false
-draft: true
+publish: true
+draft: false
 enableToc: true
 tags:
   - internals
