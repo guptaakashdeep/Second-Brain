@@ -80,7 +80,10 @@ This is achieved via the **Dataset** or **ParquetFile** APIs, using iterators
 # Huge Multifile dataset like Hive-partitioned or directory-based Parquet dataset
 import pyarrow.dataset as ds
 
-dataset = ds.dataset("s3://bucket/hive-partitioned-data/", format="parquet", partitioning="hive")
+dataset = ds.dataset(
+	"s3://bucket/hive-partitioned-data/",
+	format="parquet",
+	partitioning="hive")
 
 for batch in dataset.to_batches(
 	columns=["user_id", "event_type"],

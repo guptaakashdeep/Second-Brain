@@ -11,6 +11,7 @@ This is the origin of my in-depth Technical Newsletter: [The Pragmatic Data Engi
 #DataEngineering #Spark #internals #Optimization #Programming #Airflow #BestPractices #Python #Debug  
 # Index
 
+- Nov 01, 2025: [[Using Context Objects in Python]]
 - Oct 25, 2025: [[Why Do Parquet and ORC Store Data That Way?]]
 - Oct 24, 2025: [[Sum Types in SQL]]
 - Oct 23, 2025: [[PyArrow - Read-Write into Hive External Tables]]
