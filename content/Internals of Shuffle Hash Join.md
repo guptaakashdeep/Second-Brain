@@ -86,6 +86,10 @@ Here's the step by step process:
 ## Visual representation of both the Phases
 
 ```mermaid
+---
+config:
+  theme: neutral
+---
 flowchart TD
 
 OrdersTable[Left Table: Orders] -- "Hash Partitioning" --> OrdersShuffleWrite[Shuffle Write - Orders]
