@@ -120,18 +120,18 @@ Build2 --> Probe2[Probe: Each Order in Orders Partition 2, lookup in Hash Table]
 Probe2 --> JoinOut2[Join Output 2]
 end
 
-style OrdersTable fill:#bbdefb
-style CustomersTable fill:#c8e6c9
-style OrdersShuffleWrite fill:#90caf9
-style CustomersShuffleWrite fill:#a5d6a7
-style Exec1 fill:#ffe082
-style Exec2 fill:#ffe082
-style Build1 fill:#ffd54f
-style Build2 fill:#ffd54f
-style Probe1 fill:#b2dfdb
-style Probe2 fill:#b2dfdb
-style JoinOut1 fill:#ce93d8
-style JoinOut2 fill:#ce93d8
+%% style OrdersTable fill:#bbdefb
+%% style CustomersTable fill:#c8e6c9
+%% style OrdersShuffleWrite fill:#90caf9
+%% style CustomersShuffleWrite fill:#a5d6a7
+%% style Exec1 fill:#ffe082
+%% style Exec2 fill:#ffe082
+%% style Build1 fill:#ffd54f
+%% style Build2 fill:#ffd54f
+%% style Probe1 fill:#b2dfdb
+%% style Probe2 fill:#b2dfdb
+%% style JoinOut1 fill:#ce93d8
+%% style JoinOut2 fill:#ce93d8
 ```
 
 ### Example for concrete understanding
