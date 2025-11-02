@@ -1,7 +1,7 @@
 ---
 title: Internals of Shuffle Hash Join
-publish: false
-draft: true
+publish: true
+draft: false
 enableToc: true
 tags:
   - internals
