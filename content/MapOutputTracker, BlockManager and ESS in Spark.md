@@ -94,14 +94,14 @@ sequenceDiagram
     Note over Driver: On Driver startup:<br/>MasterMapOutputTracker<br/>MasterBlockManager instantiated
 
     %% Executors register BlockManagers
-    Note over ExecA: On startup:<br/>BlockManager initialized
-    Note over ExecB: On startup:<br/>BlockManager initialized
+    Note over ExecA: On startup: BlockManager initialized
+    Note over ExecB: On startup: BlockManager initialized
     ExecA->>Driver: Register BlockManager with MasterBlockManager
     ExecB->>Driver: Register BlockManager with MasterBlockManager
 
     %% Map Stage
     Note over ExecA: ShuffleMapTask runs inside Executor JVM A
-    ExecA->>DiskA: Write shuffle block(s) to Node A Local Disk<br/>Managed by BlockManager
+    ExecA->>DiskA: Write shuffle block(s) to Node A Local Disk Managed by BlockManager
     ExecA->>Driver: Updates BlockManagerMaster about Block IDs, sizes and location
     ExecA->>ExecA: Report shuffle metadata (shuffleId, mapId, location) to MapOutputTrackerWorker
     ExecA->>Driver: RPC - Register map output metadata with MasterMapOutputTracker
