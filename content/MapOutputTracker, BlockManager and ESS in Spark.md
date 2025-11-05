@@ -1,7 +1,7 @@
 ---
 title: What are MapOutputTracker, BlockManager, and ESS in Spark Architecture?
-publish: false
-draft: true
+publish: true
+draft: false
 enableToc: true
 tags:
   - Spark
