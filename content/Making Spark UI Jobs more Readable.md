@@ -95,5 +95,7 @@ Here's what Spark UI looks like after running this Spark Application:
 
 ![[Spark-UI-setJobGroup.png]]
 
+> [!caution]
+> If you want to set Job Group for a particular section in code, make sure to **CLEAR THE JOB GROUP** using `sc.setJobGroup(None, None)`, else all the further Job Groups and descriptions will be marked as the last set job group.
 ## References
 - [Spark Documentation](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.SparkContext.setJobGroup.html)
