@@ -82,48 +82,7 @@ Block Managers are also **process-level components**, i.e., exist per JVM proces
 MapOutputTracker and BlockManager play a crucial role while fetching data from different nodes. Here's a simple example of how both these works together.
 ### How do MapOutputTracker and BlockManager work together?
 
-```mermaid
-sequenceDiagram
-    participant Driver as Driver JVM
-    participant ExecA as Executor JVM A (Map Task)
-    participant ExecB as Executor JVM B (Reduce Task)
-    participant DiskA as Local Disk (Node A)
-    participant DiskB as Local Disk (Node B)
-
-    %% Driver Setup
-    Note over Driver: On Driver startup:<br/>MasterMapOutputTracker<br/>MasterBlockManager instantiated
-
-    %% Executors register BlockManagers
-    Note over ExecA: On startup: BlockManager initialized
-    Note over ExecB: On startup: BlockManager initialized
-    ExecA->>Driver: Register BlockManager with MasterBlockManager
-    ExecB->>Driver: Register BlockManager with MasterBlockManager
-
-    %% Map Stage
-    Note over ExecA: ShuffleMapTask runs inside Executor JVM A
-    ExecA->>DiskA: Write shuffle block(s) to Node A Local Disk Managed by BlockManager
-    ExecA->>Driver: Updates BlockManagerMaster about Block IDs, sizes and location
-    ExecA->>ExecA: Report shuffle metadata (shuffleId, mapId, location) to MapOutputTrackerWorker
-    ExecA->>Driver: RPC - Register map output metadata with MasterMapOutputTracker
-
-    %% Reduce Stage
-    Note over ExecB: Reduce Task runs inside Executor JVM B
-    ExecB->>ExecB: Lookup shuffle metadata in local MapOutputTrackerWorker
-    alt Metadata not found
-        ExecB->>Driver: RPC - Request shuffle metadata from MasterMapOutputTracker
-        Driver-->>ExecB: Respond metadata (location info)
-        ExecB->>ExecB: Cache metadata locally in MapOutputTrackerWorker
-    end
-
-    %% Block Fetch via BlockManager
-    ExecB->>ExecB: Use BlockManager to fetch blocks
-    ExecB->>ExecA: BlockManager(BlockTransferService) requests shuffle block
-    ExecA->>ExecB: BlockManager streams shuffle block from local disk via Netty
-    ExecB->>DiskB: Stores received block as needed
-
-    Note over ExecB: Reduce task merges shuffle blocks for computation
-
-```
+![[MapOT-BlockManager-Interaction.png]]
 
 1. **Initialization**
     - During driver initialization, `MasterMapOutputTracker` and `MasterBlockManager` are started
@@ -173,54 +132,8 @@ ESS is enabled via `spark.shuffle.service.enabled=true`
 
 Updated Sequence Diagram with ESS Enabled
 
-```mermaid
-sequenceDiagram
-    participant Driver as Driver JVM
-    participant ExecA as Executor JVM A (Map Task)
-    participant ExecB as Executor JVM B (Reduce Task)
-    participant ESSA as ESS - Node A
-    participant ESSB as ESS - Node B
-    participant DiskA as Local Disk (Node A)
-    participant DiskB as Local Disk (Node B)
+![[MOT-BM-ESS-Interaction.png]]
 
-    %% Driver Setup
-    Note over Driver: On Driver startup:<br/>MasterMapOutputTracker<br/>MasterBlockManager instantiated
-
-    %% Executors register BlockManagers
-    Note over ExecA: On startup:<br/>BlockManager initialized
-    Note over ExecB: On startup:<br/>BlockManager initialized
-    ExecA->>ESSA: Register BlockManager with ESS
-    ExecA->>Driver: Register BlockManager with MasterBlockManager
-    ExecA->>Driver: Register BlockManager ESS host, port in MapOutputTrackerMaster
-    ExecB->>ESSB: Register BlockManager with ESS
-    ExecB->>Driver: Register BlockManager with MasterBlockManager
-    ExecB->>Driver: Register BlockManager ESS host, port in MapOutputTrackerMaster
-
-    %% Map Stage
-    Note over ExecA: ShuffleMapTask runs inside Executor JVM A
-    ExecA->>DiskA: Write shuffle block(s) to Node A Local Disk<br/>Managed by BlockManager
-    ExecA->>ESSA: Register written shuffle files metadata <br/> (ShuffleID, MapID, DataFilePath, IndexFilePath)
-    ExecA->>ExecA: Report shuffle metadata (shuffleId, mapId, location) to MapOutputTrackerWorker
-    ExecA->>Driver: RPC - Register map output metadata with MasterMapOutputTracker
-    Note over ExecA: ShuffleMapTask Finished
-
-    %% Reduce Stage
-    Note over ExecB: Reduce Task runs inside Executor JVM B
-    ExecB->>ExecB: Lookup shuffle metadata in local MapOutputTrackerWorker
-    alt Metadata not found
-        ExecB->>Driver: RPC - Request shuffle metadata from MasterMapOutputTracker
-        Driver-->>ExecB: Respond metadata (location info)
-        ExecB->>ExecB: Cache metadata locally in MapOutputTrackerWorker
-    end
-
-    %% Block Fetch via BlockManager
-    ExecB->>ExecB: Use BlockManager to fetch blocks
-    ExecB->>ESSA: BlockManager(BlockTransferService) requests shuffle block
-    ESSA->>ExecB: Streams shuffle block from local disk via Netty
-
-    Note over ExecB: Reduce task merges shuffle blocks for computation
-
-```
 
 1. **Executor Starts**
     - The executor creates a `BlockManager` as usual.
