@@ -79,10 +79,10 @@ Block Managers are also **process-level components**, i.e., exist per JVM proces
     - Serving data to other executors via Netty-based shuffle or BlockTransferService RPC.
     - Fetching remote blocks from peer executors when needed.
 
-MapOutputTracker and BlockManager play a crucial role while fetching data from different nodes. Here's a simple example of how both these works together.
+MapOutputTracker and BlockManager play a crucial role while fetching data from different nodes. Here's a simple example of how both these work together.
 ### How do MapOutputTracker and BlockManager work together?
 
-![[MapOT-BlockManager-Interaction.png]]
+![[MOT-BM-interaction.png]]
 
 1. **Initialization**
     - During driver initialization, `MasterMapOutputTracker` and `MasterBlockManager` are started
