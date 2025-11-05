@@ -124,6 +124,7 @@ sequenceDiagram
     Note over ExecB: Reduce task merges shuffle blocks for computation
 
 ```
+
 1. **Initialization**
     - During driver initialization, `MasterMapOutputTracker` and `MasterBlockManager` are started
     - During executors initialization, 
@@ -171,6 +172,7 @@ With ESS enabled:
 ESS is enabled via `spark.shuffle.service.enabled=true`
 
 Updated Sequence Diagram with ESS Enabled
+
 ```mermaid
 sequenceDiagram
     participant Driver as Driver JVM
@@ -219,6 +221,7 @@ sequenceDiagram
     Note over ExecB: Reduce task merges shuffle blocks for computation
 
 ```
+
 1. **Executor Starts**
     - The executor creates a `BlockManager` as usual.
     - It also opens a connection to the ESS running on the same node.
