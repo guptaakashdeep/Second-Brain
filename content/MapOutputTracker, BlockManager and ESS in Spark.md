@@ -21,39 +21,41 @@ A core internal components that manage **shuffle map output metadata**, essenti
 These are **process-level components**, i.e., exist per JVM process, a.k.a. exists per executor.
 
 Map Output Tracker also has a Master/Worker architecture:
-- `MasterMapOutputTracker`: **Runs on the driver**
-- `MapOutputTracker`: **Runs on executors**
+- `MapOutputTracker`: **Runs on the driver** (also known as Master MapOutputTracker)
+- `MapOutputTrackerWorker`: **Runs on executors**
 
-### MasterMapOutputTracker
+### MapOutputTracker
 - **Runs on the driver** and holds the authoritative metadata about all shuffle map outputs for the ***whole*** application.
 - After a shuffle map stage finishes, the driver collects:
-    - Map task indexes → corresponding shuffle server locations.
+    - Map task indexes to corresponding shuffle server locations.
     - Shuffle file identifiers. 
 - This tracker serves metadata to executors when requested over RPC.
 - It can invalidate, update, and broadcast new shuffle output mappings when reruns or speculative tasks happen.
 
-### MapOutputTracker
+### MapOutputTrackerWorker
 - **Runs on executors** (worker nodes) to cache and use metadata about shuffle outputs.
-- When a reduce task needs to read map outputs, it contacts the tracker to get information about:
+- When a reduce task needs to read map outputs, it contacts the driver MapOutputTracker to get information about:
     - The **executor location** (host/port).
     - **Block IDs** and sizes.
-- The worker tracker pulls this metadata from the driver and caches it locally to avoid repeated requests.
+- The worker tracker (**MapOuputTrackerWorker**) pulls this metadata from the driver and caches it locally to avoid repeated requests.
 
 ### How do they work during Spark Application Execution?
 1. **Map Stage Completion**
-    - After map tasks finish writing shuffle data to disk (one file per reduce partition), each executor reports its shuffle output metadata back to the **MasterMapOutputTracker** on the driver.
+    - After map tasks finish writing shuffle data to disk (one file per reduce partition), each executor reports its shuffle output metadata back to the **MapOutputTracker** on the driver.
 2. **Metadata Storage**
-    - `MasterMapOutputTracker` stores a mapping:
+    - `MapOutputTracker` stores a mapping:
         `shuffleId --> mapId --> (host:port, blockId, size)`
     - This becomes the _global view_ of shuffle outputs.
 3. **Reduce Stage Fetch**
-    - When a reduce task is scheduled on a worker executor, Spark requests the shuffle output locations for the relevant `shuffleId` from the `MapOutputTrackerWorker`.
+    - When a reduce task is scheduled on a worker executor, 
+	    - Spark looks into the local `MapOutputTrackerWorker` for the relevant `shuffleId`.
+	    - If not found locally, Spark requests the shuffle output locations for the relevant `shuffleId` from the driver's `MapOutputTracker`.
     - If the worker tracker doesn’t have this metadata in its local cache, it:
-        - Sends an RPC to the driver’s `MasterMapOutputTracker`.
+        - Sends an RPC to the driver’s `MapOutputTracker`.
         - Gets the location metadata back.
         - Stores it locally for reuse (avoids multiple RPCs).
 4. **Broadcast & Cache Invalidation**
-    - If map outputs are ***LOST*** due to executor failure or re-computation, the driver invalidates certain map output locations in the `MasterMapOutputTracker`.
+    - If map outputs are ***LOST*** due to executor failure or re-computation, the driver invalidates certain map output locations in the `MapOutputTracker`.
     - Updated metadata is then broadcast to workers.
 
 ## Block Manager
@@ -132,13 +134,13 @@ ESS is enabled via `spark.shuffle.service.enabled=true`
 
 Updated Sequence Diagram with ESS Enabled
 
-![[MOT-BM-ESS-Interaction.png]]
+![[MOT-BM-ESS-interaction.png]]
 
 
 1. **Executor Starts**
     - The executor creates a `BlockManager` as usual.
     - It also opens a connection to the ESS running on the same node.
-    - `BlockManager` registers its shuffle service endpoint (host, ESS port) in the `MapOutputTrackerMaster`.
+    - `BlockManager` registers its shuffle service endpoint (host, ESS port) in the `MapOutputTracker`.
 2. **Map Task Writes Shuffle Files**
     - The executor still writes shuffle data to its local disk (e.g., `/localdir/blockmgr-*/shuffle_*`).
     - When `ShuffleMapTask` finishes, instead of relying solely on the executor’s BlockManager to serve those files later, it **registers the file metadata** with the ESS.
@@ -169,7 +171,7 @@ config:
 ---
 flowchart TB
  subgraph Driver["Driver JVM (YARN Container)"]
-        MMT["MasterMapOutputTracker<br>- Shuffle metadata registry<br>- shuffleId → mapId → location"]
+        MMT["MapOutputTracker<br>- Shuffle metadata registry<br>- shuffleId → mapId → location"]
         BMM["BlockManagerMaster<br>- Global block metadata<br>- blockId → executor locations"]
   end
  subgraph Exec1["Executor JVM 1 - Map Stage"]
