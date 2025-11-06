@@ -134,7 +134,7 @@ ESS is enabled via `spark.shuffle.service.enabled=true`
 
 Updated Sequence Diagram with ESS Enabled
 
-![[MOT-BM-ESS-interaction.png]]
+![[MOT-BM-ESS-interaction-new.png]]
 
 
 1. **Executor Starts**
