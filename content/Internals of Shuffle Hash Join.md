@@ -21,7 +21,7 @@ This phase redistributes data so that rows with the same join key end up on the 
 
 Here's the step-by-step process:
 1. **Source Data Reading:** Both left and right datasets are read from their sources (HDFS, S3, etc).
-2. **Partition Key Extraction:** For each row, Spark extracts the join key and computes a partition ID using **[[Hash Partitioner]]**
+2. **Partition Key Extraction:** For each row, Spark extracts the join key and computes a partition ID using **[[HashPartitioner]]**
 	- Uses **Murmur3Hash** function on the join key expressions
 	- Applies the modulo operation
 $$
@@ -33,11 +33,11 @@ $$
 3. **Shuffle Write (Map Side):**
 	- Each partition of the source data is processed by a shuffle map task
 	- Rows are serialized and written to the local disk as shuffle files
-	- Shuffle metadata (locations, sizes) is registered with the **[[MapOutputTrackerMaster]]** on the driver
+	- Shuffle metadata (locations, sizes) is registered with the **[[MapOutputTracker, BlockManager and ESS in Spark#MasterMapOutputTracker|MapOutputTrackerMaster]]** on the driver
 	- Creates intermediate shuffle files organized by (mapId, reduceId) pairs.
 4. **Shuffle Read (Reduce Side):**
 	- Executors fetch shuffle blocks from remote executors based on partition assignments
-	- **[[MapOutputTracker]]** coordinates which blocks to fetch from which executors
+	- **[[MapOutputTracker, BlockManager and ESS in Spark#MapOutputTracker|MapOutputTracker]]** coordinates which blocks to fetch from which executors
 	- Data is transferred over the network and deserialized into memory
 	- After the shuffle, all rows with the same join key reside in the same partition
 ### Phase 2: Hash Join Phase
