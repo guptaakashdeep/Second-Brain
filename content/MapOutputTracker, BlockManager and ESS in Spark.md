@@ -111,7 +111,7 @@ MapOutputTracker and BlockManager play a crucial role while fetching data from d
 
 So both MapOutputTracker and BlockManager are at per-executor level, and store all the required details. What happens if the Executor goes down for whatever reason?!?
 
-That's one of the reasons, when you see [[Reasons for FetchFailedException in Spark|FetchFailedException]], i.e., when the next stage task (Reducer Stage) tries to fetch the shuffle files from the executor that has gone down.
+That's one of the reasons, when you see [[Understanding FetchFailedException Message|FetchFailedException]], i.e., when the next stage task (Reducer Stage) tries to fetch the shuffle files from the executor that has gone down.
 
 To avoid these scenarios, during any Spark Application running with [[Spark Dynamic Resource Allocation|Dynamic Resource Allocation]] enabled, the External Shuffle Service (ESS) is used.
 ## External Shuffle Service (ESS)
