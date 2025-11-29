@@ -21,8 +21,8 @@ This phase redistributes data so that rows with the same join key end up on the 
 
 Here's the step-by-step process:
 1. **Source Data Reading:** Both left and right datasets are read from their sources (HDFS, S3, etc).
-2. **Partition Key Extraction:** For each row, Spark extracts the join key and computes a partition ID using **[[HashPartitioner]]**
-	- Uses **Murmur3Hash** function on the join key expressions
+2. **Partition Key Extraction:** For each row, Spark extracts the join key and computes a partition ID
+	- Uses collision-aware **[[Murmur3Hash]]** function on the join key expressions
 	- Applies the modulo operation
 $$
 \begin{gather*}
