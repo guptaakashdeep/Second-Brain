@@ -48,7 +48,7 @@ Here's a simple example to understand this:
 
 Let's assume there are 4 records in a RDD with keys as 1,2,3,4 and numPartitions = 2
 
-```math
+```
 Key 1: 1 % 2 = 1 --> Partition 1
 Key 2: 2 % 2 = 0 --> Partition 0
 Key 3: 3 % 2 = 1 --> Partition 1
