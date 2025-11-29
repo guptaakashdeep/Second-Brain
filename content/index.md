@@ -11,6 +11,7 @@ This is the origin of my in-depth Technical Newsletter: [The Pragmatic Data Engi
 #DataEngineering #Spark #internals #Optimization #Programming #Airflow #BestPractices #Python #Debug  
 # Index
 
+- Nov 29, 2025: [[HashPartitioner in Apache Spark]]
 - Nov 05, 2025: [[MapOutputTracker, BlockManager and ESS in Spark|What are MapOutputTracker, BlockManager, and ESS in Spark Architecture?]]
 - Nov 03, 2025: [[yarn top - details]]
 - Nov 02, 2025: [[Internals of Shuffle Hash Join]]
