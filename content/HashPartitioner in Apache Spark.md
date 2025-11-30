@@ -17,7 +17,7 @@ Spark uses this partitioner internally for many shuffle-based **RDD transformati
 The main role of HashPartitioner is to guarantee that identical keys are co-located, which enables parallel aggregation and joins without repeated data movement.
 
 > [!info]- Misconception: HashPartitioning uses HashPartitioner internally
-> HashPartitioner and [[HashPartitioning]] are independent of each other and belong to different layers of Spark, i.e., Spark Core and Spark SQL/Catalyst, respectively.
+> HashPartitioner and [[HashPartitioning in Apache Spark|HashPartitioning]] are independent of each other and belong to different layers of Spark: Spark Core and Spark SQL/Catalyst, respectively.
 > 
 > Although mathematical logic and the role of both things are same:
 > `Hash % numPartitions`
