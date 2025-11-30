@@ -39,6 +39,14 @@ case class HashPartitioning(expressions: Seq[Expression], numPartitions: Int)
 }
 ```
 
+> [!important]- Spark 4.0 uses CollationAwareMurmur3Hash instead of just Murmur3Hash
+> CollationAwareMurmur3Hash extends `Expression` and generates code that:
+> 1. Iterates through input children (expressions).
+> 2. If a child is a String type with a **non-binary [[collation]]** (e.g., `UTF8_LCASE`), it calls `CollationFactory.getCollationKey` to convert the string to its canonical binary representation (e.g., lowercased bytes).
+> 3. Feeds this canonical binary data into the Murmur3 hash function.
+> 4. If the child is a standard binary/default collation type, it feeds it directly to the hash function (same as the legacy `Murmur3Hash`).
+> 
+> This ensures that values like "Spark" and "spark" produce the same hash when using a case-insensitive collation, guaranteeing they land in the same partition for joins and aggregations.
 ### Sample Code
 Here's a sample code that can validate the same concept
 
