@@ -5,7 +5,7 @@ draft: false
 enableToc: true
 tags:
   - Spark
-  - internal
+  - internals
 cssclasses:
   - page-rainbow
 ---
